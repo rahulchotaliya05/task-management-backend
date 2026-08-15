@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import authRoutes from './routes/auth.routes.js';
+import boardRoutes from './routes/board.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/boards', boardRoutes);
+app.use('/api/v1/users', userRoutes);
 
 app.use(errorMiddleware);
 

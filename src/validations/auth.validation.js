@@ -15,6 +15,7 @@ export const registerSchema = Joi.object({
     'string.max': 'Password cannot exceed 100 characters',
     'any.required': 'Password is required',
   }),
+  role: Joi.string().valid('admin', 'user').default('user'),
 });
 
 export const loginSchema = Joi.object({

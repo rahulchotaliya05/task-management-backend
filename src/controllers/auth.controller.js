@@ -36,7 +36,7 @@ const saveRefreshToken = async (userId, token) => {
 };
 
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
 
   const existingUser = await User.findOne({ email });
 
@@ -44,7 +44,7 @@ export const register = asyncHandler(async (req, res) => {
     throw ApiError.conflict('Email already registered');
   }
 
-  const user = await User.create({ name, email, password });
+  const user = await User.create({ name, email, password, role });
 
   return ApiResponse.created(res, 'User registered successfully. Please login.', {
     user: user.convertToJSON(),
