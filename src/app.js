@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 
 import { errorMiddleware } from './middlewares/error.middleware.js';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use(morgan('dev'));
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
+
+app.use('/api/v1/auth', authRoutes);
 
 app.use(errorMiddleware);
 
