@@ -1,4 +1,4 @@
-import { Board, User, Column } from '../models/index.js';
+import { Board, User, Column, Card } from '../models/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
@@ -18,6 +18,7 @@ export const getBoards = asyncHandler(async (req, res) => {
   const { search } = req.query;
 
   const query = {
+    deletedAt: null,
     $or: [
       { owner: req.user._id },
       { members: req.user._id },
@@ -37,7 +38,7 @@ export const getBoards = asyncHandler(async (req, res) => {
 });
 
 export const getBoardById = asyncHandler(async (req, res) => {
-  const board = await Board.findById(req.params.id)
+  const board = await Board.findOne({ _id: req.params.id, deletedAt: null })
     .populate('owner', 'name email')
     .populate('members', 'name email');
 
@@ -47,9 +48,14 @@ export const getBoardById = asyncHandler(async (req, res) => {
 
   const columns = await Column.find({ board: board._id }).sort({ position: 1 });
 
+  const cards = await Card.find({ board: board._id, deletedAt: null })
+    .populate('assignee', 'name email')
+    .sort({ position: 1 });
+
   return ApiResponse.success(res, 'Board fetched successfully', {
     board,
     columns,
+    cards,
   });
 });
 

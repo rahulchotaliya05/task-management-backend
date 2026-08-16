@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.routes.js';
 import boardRoutes from './routes/board.routes.js';
 import userRoutes from './routes/user.routes.js';
 import columnRoutes from './routes/column.routes.js';
+import cardRoutes from './routes/card.routes.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/boards', boardRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', columnRoutes);
+app.use('/api/v1', cardRoutes);
 
 app.use(errorMiddleware);
 

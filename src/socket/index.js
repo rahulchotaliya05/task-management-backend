@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
 
 let io;
 
@@ -13,8 +14,32 @@ export const initSocket = (httpServer) => {
   io.on('connection', (socket) => {
     console.log(`Socket connected: ${socket.id}`);
 
+    socket.on('board:join', (boardId) => {
+      socket.join(boardId);
+      socket.boardId = boardId;
+
+      socket.to(boardId).emit('user:joined', {
+        socketId: socket.id,
+        message: 'A user joined the board',
+      });
+    });
+
+    socket.on('board:leave', (boardId) => {
+      socket.leave(boardId);
+
+      socket.to(boardId).emit('user:left', {
+        socketId: socket.id,
+        message: 'A user left the board',
+      });
+    });
+
     socket.on('disconnect', () => {
-      console.log(`Socket disconnected: ${socket.id}`);
+      if (socket.boardId) {
+        socket.to(socket.boardId).emit('user:left', {
+          socketId: socket.id,
+          message: 'A user left the board',
+        });
+      }
     });
   });
 
@@ -26,4 +51,10 @@ export const getIO = () => {
     throw new Error('Socket.io not initialized');
   }
   return io;
+};
+
+export const emitToBoard = (boardId, event, data) => {
+  if (io) {
+    io.to(boardId).emit(event, data);
+  }
 };
