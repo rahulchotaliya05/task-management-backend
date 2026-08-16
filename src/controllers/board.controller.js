@@ -38,6 +38,8 @@ export const getBoards = asyncHandler(async (req, res) => {
 });
 
 export const getBoardById = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
   const board = await Board.findOne({ _id: req.params.id, deletedAt: null })
     .populate('owner', 'name email')
     .populate('members', 'name email');
@@ -48,7 +50,16 @@ export const getBoardById = asyncHandler(async (req, res) => {
 
   const columns = await Column.find({ board: board._id }).sort({ position: 1 });
 
-  const cards = await Card.find({ board: board._id, deletedAt: null })
+  const cardQuery = { board: board._id, deletedAt: null };
+
+  if (search && search.trim()) {
+    cardQuery.$or = [
+      { title: { $regex: search.trim(), $options: 'i' } },
+      { description: { $regex: search.trim(), $options: 'i' } },
+    ];
+  }
+
+  const cards = await Card.find(cardQuery)
     .populate('assignee', 'name email')
     .sort({ position: 1 });
 
