@@ -205,6 +205,27 @@ This approach is simple, correct, and sufficient for a collaborative Kanban boar
 | User | evan@taskboard.com | user123 |
 | User | fiona@taskboard.com | user123 |
 
+## Docker
+
+### Run with Docker Compose (full stack)
+
+```bash
+# From the workspace root (where docker-compose.yml is)
+cp docker.env.example docker.env
+# Edit docker.env with your JWT secrets
+
+docker compose up --build
+```
+
+This starts: MongoDB (port 27017) + Backend (port 5000) + Frontend (port 80)
+
+### Backend image size
+
+The multi-stage Dockerfile produces an image under 200MB:
+- Base: node:18-alpine (~180MB with dependencies)
+- Only production `node_modules` + source code copied to final stage
+- No dev dependencies, no source maps
+
 ## Scripts
 
 | Command | Description |

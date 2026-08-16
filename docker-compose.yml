@@ -1,0 +1,38 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: taskboard-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./task-management-backend
+      dockerfile: Dockerfile
+    container_name: taskboard-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./docker.env
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./task-management-frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000/api/v1
+    container_name: taskboard-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
