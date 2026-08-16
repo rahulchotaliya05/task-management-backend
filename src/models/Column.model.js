@@ -18,6 +18,10 @@ const columnSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -25,6 +29,13 @@ const columnSchema = new mongoose.Schema(
 );
 
 columnSchema.index({ board: 1, position: 1 });
+
+columnSchema.pre(/^find/, function (next) {
+  if (this.getOptions().includeDeleted !== true) {
+    this.where({ deletedAt: null });
+  }
+  next();
+});
 
 const Column = mongoose.model('Column', columnSchema);
 

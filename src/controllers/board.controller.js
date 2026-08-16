@@ -1,4 +1,4 @@
-import { Board, User } from '../models/index.js';
+import { Board, User, Column } from '../models/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
@@ -45,7 +45,12 @@ export const getBoardById = asyncHandler(async (req, res) => {
     throw ApiError.notFound('Board not found');
   }
 
-  return ApiResponse.success(res, 'Board fetched successfully', { board });
+  const columns = await Column.find({ board: board._id }).sort({ position: 1 });
+
+  return ApiResponse.success(res, 'Board fetched successfully', {
+    board,
+    columns,
+  });
 });
 
 export const updateBoard = asyncHandler(async (req, res) => {
