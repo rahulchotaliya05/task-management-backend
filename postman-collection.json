@@ -1,0 +1,677 @@
+{
+  "info": {
+    "name": "Task Management Board API",
+    "_postman_id": "task-board-api-collection",
+    "description": "Real-time Collaborative Task Board - Complete API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"test123\",\n  \"role\": \"user\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully. Please login.\",\n  \"data\": {\n    \"user\": {\n      \"name\": \"Test User\",\n      \"email\": \"test@example.com\",\n      \"role\": \"user\",\n      \"_id\": \"64abc123def456\",\n      \"createdAt\": \"2026-08-16T00:00:00.000Z\",\n      \"updatedAt\": \"2026-08-16T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@taskboard.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"64abc123def456\",\n      \"name\": \"Admin User\",\n      \"email\": \"admin@taskboard.com\",\n      \"role\": \"admin\"\n    },\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIs...\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Refresh token is sent automatically via HTTP-only cookie"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Token refreshed successfully\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIs...\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Logged out successfully\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"User profile fetched\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"64abc123def456\",\n      \"name\": \"Admin User\",\n      \"email\": \"admin@taskboard.com\",\n      \"role\": \"admin\",\n      \"createdAt\": \"2026-08-16T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Returns all users except the current user. Used for member allocation."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Users fetched successfully\",\n  \"data\": {\n    \"users\": [\n      {\n        \"_id\": \"64abc123def456\",\n        \"name\": \"John Developer\",\n        \"email\": \"john@taskboard.com\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Boards",
+      "item": [
+        {
+          "name": "Create Board",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/boards",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Sprint Board\"\n}"
+            },
+            "description": "Admin only. Creates a new board with the caller as owner."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Board created successfully\",\n  \"data\": {\n    \"board\": {\n      \"_id\": \"64abc123def456\",\n      \"title\": \"New Sprint Board\",\n      \"owner\": \"64abc123def456\",\n      \"members\": [],\n      \"deletedAt\": null,\n      \"createdAt\": \"2026-08-16T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Boards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/boards?search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Optional. Filter boards by title."
+                }
+              ]
+            },
+            "description": "Returns boards owned by or shared with the current user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Boards fetched successfully\",\n  \"data\": {\n    \"boards\": [\n      {\n        \"_id\": \"64abc123def456\",\n        \"title\": \"E-Commerce Platform\",\n        \"owner\": { \"_id\": \"...\", \"name\": \"Admin User\", \"email\": \"admin@taskboard.com\" },\n        \"members\": [{ \"_id\": \"...\", \"name\": \"John Developer\", \"email\": \"john@taskboard.com\" }],\n        \"deletedAt\": null,\n        \"createdAt\": \"2026-08-16T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Board By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id?search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                }
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Optional. Filter cards by title/description."
+                }
+              ]
+            },
+            "description": "Returns board details with columns and cards. Must be owner or member."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Board fetched successfully\",\n  \"data\": {\n    \"board\": { \"_id\": \"...\", \"title\": \"...\", \"owner\": {...}, \"members\": [...] },\n    \"columns\": [{ \"_id\": \"...\", \"title\": \"To Do\", \"position\": 0 }],\n    \"cards\": [{ \"_id\": \"...\", \"title\": \"...\", \"column\": \"...\", \"position\": 0, \"priority\": \"high\", \"assignee\": {...} }]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Board",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Board Title\"\n}"
+            },
+            "description": "Admin/owner only."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Board updated successfully\",\n  \"data\": {\n    \"board\": { \"_id\": \"...\", \"title\": \"Updated Board Title\" }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Board (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                }
+              ]
+            },
+            "description": "Admin/owner only. Sets deletedAt timestamp."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Board deleted successfully\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id", "members"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"<user_id>\"\n}"
+            },
+            "description": "Admin/owner only. Adds a user as a board member."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Member added successfully\",\n  \"data\": {\n    \"board\": { \"_id\": \"...\", \"members\": [...] }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id/members/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id", "members", ":userId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                },
+                {
+                  "key": "userId",
+                  "value": "<user_id>"
+                }
+              ]
+            },
+            "description": "Admin/owner only."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Member removed successfully\",\n  \"data\": {\n    \"board\": { \"_id\": \"...\", \"members\": [...] }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Columns",
+      "item": [
+        {
+          "name": "Create Column",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/boards/:id/columns",
+              "host": ["{{baseUrl}}"],
+              "path": ["boards", ":id", "columns"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<board_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"In Review\"\n}"
+            },
+            "description": "Board owner only. Position auto-assigned."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Column created successfully\",\n  \"data\": {\n    \"column\": {\n      \"_id\": \"...\",\n      \"title\": \"In Review\",\n      \"board\": \"...\",\n      \"position\": 3\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Column",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/columns/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["columns", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<column_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Column Name\"\n}"
+            },
+            "description": "Board owner only. Can update title and/or position."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Column updated successfully\",\n  \"data\": {\n    \"column\": { \"_id\": \"...\", \"title\": \"Updated Column Name\", \"position\": 0 }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Column (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/columns/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["columns", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<column_id>"
+                }
+              ]
+            },
+            "description": "Board owner only. Soft-deletes column and all cards inside it."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Column deleted successfully\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cards",
+      "item": [
+        {
+          "name": "Create Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/columns/:id/cards",
+              "host": ["{{baseUrl}}"],
+              "path": ["columns", ":id", "cards"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<column_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implement login page\",\n  \"description\": \"Create responsive login form with validation\",\n  \"priority\": \"high\",\n  \"assignee\": \"<user_id>\",\n  \"dueDate\": \"2026-09-01\"\n}"
+            },
+            "description": "Board member. Position auto-assigned. Assignee and dueDate are optional."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Card created successfully\",\n  \"data\": {\n    \"card\": {\n      \"_id\": \"...\",\n      \"title\": \"Implement login page\",\n      \"description\": \"Create responsive login form with validation\",\n      \"priority\": \"high\",\n      \"assignee\": { \"_id\": \"...\", \"name\": \"John\", \"email\": \"john@taskboard.com\" },\n      \"dueDate\": \"2026-09-01T00:00:00.000Z\",\n      \"column\": \"...\",\n      \"board\": \"...\",\n      \"position\": 0\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Card",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cards/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["cards", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<card_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated card title\",\n  \"priority\": \"urgent\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "description": "Board member. Any combination of fields can be updated."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Card updated successfully\",\n  \"data\": {\n    \"card\": { \"_id\": \"...\", \"title\": \"Updated card title\", \"priority\": \"urgent\" }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Card (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cards/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["cards", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<card_id>"
+                }
+              ]
+            },
+            "description": "Board member. Sets deletedAt timestamp."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Card deleted successfully\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Move Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cards/:id/move",
+              "host": ["{{baseUrl}}"],
+              "path": ["cards", ":id", "move"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "<card_id>"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetColumnId\": \"<target_column_id>\",\n  \"position\": 0\n}"
+            },
+            "description": "Board member. Atomically moves card between columns using Mongoose transactions."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Card moved successfully\",\n  \"data\": {\n    \"card\": { \"_id\": \"...\", \"column\": \"<target_column_id>\", \"position\": 0 }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
